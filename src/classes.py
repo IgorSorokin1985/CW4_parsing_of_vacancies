@@ -3,8 +3,9 @@ import json
 
 class HeadHunterAPI:
     HH_API_URL = 'https://api.hh.ru/vacancies'
+    HH_API_URL_AREAS = 'https://api.hh.ru/areas'
     def __init__(self):
-        self.params = {'per_page': 100}
+        self.params = {'per_page': 10}
 
     def get_vacancies(self):
         response = requests.get(self.HH_API_URL, self.params)
@@ -21,7 +22,27 @@ class HeadHunterAPI:
 
     @staticmethod
     def find_city_number(city):
-        pass
+        areas = HeadHunterAPI.all_areas()
+        if city.lower() in areas:
+            return areas[city.lower()]
+        else:
+            return None
+
+    @staticmethod
+    def all_areas():
+        req = requests.get(HeadHunterAPI.HH_API_URL_AREAS)
+        data = req.content.decode()
+        req.close()
+        dict_areas = json.loads(data)
+        areas = {}
+        for k in dict_areas:
+            for i in range(len(k['areas'])):
+                if len(k['areas'][i]['areas']) != 0:  # Если у зоны есть внутренние зоны
+                    for j in range(len(k['areas'][i]['areas'])):
+                        areas[k['areas'][i]['areas'][j]['name'].lower()] = k['areas'][i]['areas'][j]['id']
+                else:  # Если у зоны нет внутренних зон
+                    areas[k['areas'][i]['name'].lower()] = k['areas'][i]['id']
+        return areas
 
 class SuperJobAPI:
     pass
