@@ -1,5 +1,4 @@
-from src.classes import HeadHunterAPI
-import json
+from src.classes import HeadHunterAPI, Vacancy
 
 class Userinput:
     def __init__(self):
@@ -19,8 +18,11 @@ class Userinput:
                 self.hh_api.add_text(word)
             elif user_input == '3':
                 vacancies = self.hh_api.get_vacancies()
-                print(json.dumps(vacancies, indent=2, ensure_ascii=False))
-                print(len(vacancies['items']))
+                count = 1
+                for item in vacancies:
+                    vacancy = Vacancy(item)
+                    print(f'{count}\n{vacancy}')
+                    count += 1
             elif user_input == '4':
                 pass
             elif user_input == '5':

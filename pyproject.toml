@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "cw4-parsing-of-vacancies"
+version = "0.1.0"
+description = ""
+authors = ["IgorSorokin1985 <igorsorokin1985@gmail.com>"]
+readme = "README.md"
+packages = [{include = "cw4_parsing_of_vacancies"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.31.0"
+datetime = "^5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
