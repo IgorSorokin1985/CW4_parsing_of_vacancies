@@ -28,10 +28,20 @@ class Userinput:
                     count += 1
                     self.all_list.add_vacancy(vacancy)
             elif user_input == '4':
-                pass
+                numbers_vacancies = input('Which vacancies are you choose? Write number.')
+                numbers = []
+                if ' ' in numbers_vacancies:
+                    numbers_str = numbers_vacancies.split()
+                    for number_str in numbers_str:
+                        numbers.append(int(number_str))
+                    for number in numbers:
+                        self.mylist.add_vacancy(self.all_list.get_vacancy(number))
 
             elif user_input == '5':
-                print(self.all_list)
+                print(self.mylist)
+            elif user_input == '6':
+                for item in self.mylist.sorting_vacancies('salary_to'):
+                    print(item)
             else:
                 print('Unknown command')
 
@@ -43,6 +53,7 @@ class Userinput:
         print('3 - Research vacancies')
         print('4 - Choose vacancy for adding in MyList')
         print('5 - Show MyList')
+        print('6 - Sorting MyList')
         print('0 - Exit')
 
 class Usertelebot:
