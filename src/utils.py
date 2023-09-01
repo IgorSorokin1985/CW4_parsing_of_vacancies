@@ -1,8 +1,11 @@
-from src.classes import HeadHunterAPI, Vacancy
+from src.classes import HeadHunterAPI, Vacancy, Mylist
 
 class Userinput:
     def __init__(self):
         self.hh_api = HeadHunterAPI()
+        self.all_list = Mylist()
+        self.mylist = Mylist()
+
 
     def __call__(self):
         while True:
@@ -23,10 +26,12 @@ class Userinput:
                     vacancy = Vacancy(item)
                     print(f'{count}\n{vacancy}')
                     count += 1
+                    self.all_list.add_vacancy(vacancy)
             elif user_input == '4':
                 pass
+
             elif user_input == '5':
-                pass
+                print(self.all_list)
             else:
                 print('Unknown command')
 
