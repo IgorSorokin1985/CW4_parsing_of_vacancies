@@ -85,7 +85,10 @@ Url - {self.url}
                 return vacancy_information[param1]
             else:
                 if type(vacancy_information[param1]) == dict and param2 in vacancy_information[param1]:
-                    return vacancy_information[param1][param2]
+                    if type(vacancy_information[param1][param2]) == str and vacancy_information[param1][param2].isdigit():
+                        return int(vacancy_information[param1][param2])
+                    else:
+                        return vacancy_information[param1][param2]
                 else:
                     return None
         else:
@@ -98,4 +101,52 @@ class JSONSaver:
 class CSVSaver:
     pass
 
+class Mylist:
+    def __init__(self):
+        self.vacancy_list = []
 
+    def add_vacancy(self, vacancy):
+        self.vacancy_list.append(vacancy)
+
+    def get_vacancy(self, index):
+        return self.vacancy_list[index-1]
+
+    def delete_vacancy(self, vacancy):
+        if vacancy in self.vacancy_list:
+            self.vacancy_list.remove(vacancy)
+        else:
+            pass
+
+    def sorting_vacancies(self, param=None):
+        if param == 'data_published':
+            return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+        elif param == 'salary_to':
+            none_list = []
+            all_list = self.vacancy_list.copy()
+            for vacancy in self.vacancy_list:
+                if vacancy.salary_to == None:
+                    all_list.remove(vacancy)
+                    none_list.append(vacancy)
+            result = sorted(all_list, reverse=True, key=lambda vacancy: vacancy.salary_to)
+            for vacancy in none_list:
+                result.append(vacancy)
+            return result
+        else:
+            return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+
+    def __str__(self):
+        result = ''
+        for item in self.vacancy_list:
+            result += f'''Vacancy - {item.name}
+            Type - {item.type}
+            Data published - {item.data_published}
+            Employer - {item.employer}
+            Salary - {item.salary_from} - {item.salary_to}
+            Requirement - {item.requirement}
+            Experience - {item.experience}
+            Employment - {item.employment}
+            Area - {item.area}
+            Url - {item.url}
+    
+            '''
+        return result
