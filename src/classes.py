@@ -98,4 +98,33 @@ class JSONSaver:
 class CSVSaver:
     pass
 
+class Mylist:
+    def __init__(self):
+        self.vacancy_list = []
+        self.count = 0
 
+    def add_vacancy(self, vacancy):
+        self.vacancy_list.append(vacancy)
+
+    def delete_vacancy(self, vacancy):
+        if vacancy in self.vacancy_list:
+            self.vacancy_list.remove(vacancy)
+        else:
+            pass
+
+    def __str__(self):
+        result = ''
+        for item in self.vacancy_list:
+            result += f'''Vacancy - {item.name}
+            Type - {item.type}
+            Data published - {item.data_published}
+            Employer - {item.employer}
+            Salary - {item.salary_from} - {item.salary_to}
+            Requirement - {item.requirement}
+            Experience - {item.experience}
+            Employment - {item.employment}
+            Area - {item.area}
+            Url - {item.url}
+    
+            '''
+        return result
