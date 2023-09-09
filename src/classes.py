@@ -45,7 +45,6 @@ class HeadHunterAPI:
         return areas
 
 class SuperJobAPI:
-    pass
 
 class Vacancy:
     def __init__(self, vacancy_information):
