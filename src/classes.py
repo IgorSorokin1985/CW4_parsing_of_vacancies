@@ -45,6 +45,35 @@ class HeadHunterAPI:
         return areas
 
 class SuperJobAPI:
+    SJ_API_URL = 'https://api.superjob.ru/2.0/vacancies/'
+    SJ_API_URL_AREAS = 'https://api.superjob.ru/2.0/towns/'
+    SJ_SPI_TOKIN = 'v3.r.137807815.17181db4d5258989a59988d60bd12edf13ee0a71.bed98dc22a081d987b5c629d7799d55d36f58bb9'
+
+    def __init__(self):
+        self.params = {
+        'keyword': ['excel'],
+        'town': 397,
+        #'no_agreement': 1,
+        'page': 0}
+
+    def get_vacancies(self):
+        headers = {
+            'X-Api-App-Id': self.SJ_SPI_TOKIN
+        }
+        response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
+        response_data = json.loads(response.text)
+        print(json.dumps(response_data, indent=2, ensure_ascii=False))
+        print(len(response_data['objects']))
+        #return response_data['items']
+
+    def get_areas(self):
+        headers = {
+            'X-Api-App-Id': self.SJ_SPI_TOKIN
+        }
+        response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'page': 1})
+        response_data = json.loads(response.text)
+        print(json.dumps(response_data, indent=2, ensure_ascii=False))
+        print(len(response_data['objects']))
 
 class Vacancy:
     def __init__(self, vacancy_information):
