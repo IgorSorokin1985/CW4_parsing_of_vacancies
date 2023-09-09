@@ -6,6 +6,7 @@ class HeadHunterAPI:
     HH_API_URL_AREAS = 'https://api.hh.ru/areas'
     def __init__(self):
         self.params = {'per_page': 10}
+        self.areas = self.all_areas()
 
     def get_vacancies(self):
         response = requests.get(self.HH_API_URL, self.params)
@@ -55,6 +56,8 @@ class SuperJobAPI:
         'town': 397,
         #'no_agreement': 1,
         'page': 0}
+        #self.areas = self.all_areas()
+        self.areas = {}
 
     def get_vacancies(self):
         headers = {
@@ -74,6 +77,10 @@ class SuperJobAPI:
         response_data = json.loads(response.text)
         print(json.dumps(response_data, indent=2, ensure_ascii=False))
         print(len(response_data['objects']))
+
+    @staticmethod
+    def all_areas():
+        pass
 
 class Vacancy:
     def __init__(self, vacancy_information):
@@ -132,6 +139,9 @@ class CSVSaver:
 class Mylist:
     def __init__(self):
         self.vacancy_list = []
+
+    def __len__(self):
+        return len(self.vacancy_list)
 
     def add_vacancy(self, vacancy):
         self.vacancy_list.append(vacancy)
