@@ -203,10 +203,11 @@ class Userinput_2:
                 self.hh_api.add_words(self.param['words'])
             vacancies_hh = self.hh_api.get_vacancies()
 
-            for item in vacancies_hh:
-               vacancy = Vacancy.create_vacancy_from_hh(item)
-               print(vacancy)
-               self.all_list.add_vacancy(vacancy)
+            if vacancies_hh != []:
+                for item in vacancies_hh:
+                   vacancy = Vacancy.create_vacancy_from_hh(item)
+                   print(vacancy)
+                   self.all_list.add_vacancy(vacancy)
 
         if 'SuperJob' in self.param['website']:
             if self.param['city'] != []:
@@ -215,10 +216,12 @@ class Userinput_2:
             if self.param['words'] != []:
                 self.sj_api.add_words(self.param['words'])
             vacancies_sj = self.sj_api.get_vacancies()
-            for item in vacancies_sj:
-               vacancy = Vacancy.create_vacancy_from_sj(item)
-               print(vacancy)
-               self.all_list.add_vacancy(vacancy)
+
+            if vacancies_sj != []:
+                for item in vacancies_sj:
+                   vacancy = Vacancy.create_vacancy_from_sj(item)
+                   print(vacancy)
+                   self.all_list.add_vacancy(vacancy)
             #print(json.dumps(vacancies_sj, indent=2, ensure_ascii=False))
 
         self.sorting()
