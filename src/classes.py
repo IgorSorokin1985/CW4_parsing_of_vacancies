@@ -1,24 +1,28 @@
 import requests
 import json
+import datetime
 
 class HeadHunterAPI:
     HH_API_URL = 'https://api.hh.ru/vacancies'
     HH_API_URL_AREAS = 'https://api.hh.ru/areas'
     def __init__(self):
         self.params = {'per_page': 10}
+        self.areas = self.all_areas()
 
     def get_vacancies(self):
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
-        # print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        return response_data['items']
+        #print(json.dumps(response_data, indent=2, ensure_ascii=False))
+        if 'items' in response_data:
+            return response_data['items']
+        else:
+            return []
 
-    def add_text(self, text):
+    def add_words(self, text):
         self.params['text'] = text
 
     def add_area(self, city):
-        result = HeadHunterAPI.find_city_number(city)
-        self.params['area'] = result
+        self.params['area'] = self.areas[city]
 
     @staticmethod
     def find_city_number(city):
@@ -51,10 +55,14 @@ class SuperJobAPI:
 
     def __init__(self):
         self.params = {
-        'keyword': ['excel'],
-        'town': 397,
-        #'no_agreement': 1,
         'page': 0}
+        self.areas = self.all_areas()
+
+    def add_words(self, words):
+        self.params['keyword'] = words
+
+    def add_area(self, city):
+        self.params['town'] = self.areas[city]
 
     def get_vacancies(self):
         headers = {
@@ -62,49 +70,112 @@ class SuperJobAPI:
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
-        print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        print(len(response_data['objects']))
-        #return response_data['items']
+        #print(json.dumps(response_data, indent=2, ensure_ascii=False))
+        #print(len(response_data['objects']))
+        if 'objects' in response_data:
+            return response_data['objects']
+        else:
+            return []
 
-    def get_areas(self):
+    def all_areas(self):
         headers = {
             'X-Api-App-Id': self.SJ_SPI_TOKIN
         }
-        response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'page': 1})
+        result = {}
+        response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'id_country': 1, 'all': 1})
         response_data = json.loads(response.text)
-        print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        print(len(response_data['objects']))
+        for area in response_data['objects']:
+            result[area["title"].lower()] = area["id"]
+        #print(json.dumps(result, indent=2, ensure_ascii=False))
+        return result
 
 class Vacancy:
     def __init__(self, vacancy_information):
-        self.id = self.check_params(vacancy_information,"id")
-        self.type = self.check_params(vacancy_information, "type", "name")
-        self.name = self.check_params(vacancy_information,"name")
-        self.data_published = self.check_params(vacancy_information, "published_at")
-        self.salary_from = self.check_params(vacancy_information, "salary", "from")
-        self.salary_to = self.check_params(vacancy_information, "salary", "to")
-        self.currency = self.check_params(vacancy_information, "salary", "currency")
-        self.area = self.check_params(vacancy_information, "area", "name")
-        self.url = self.check_params(vacancy_information, "alternate_url")
-        self.employer = self.check_params(vacancy_information, "employer", "name")
-        self.employer_url = self.check_params(vacancy_information, "employer", "alternate_url")
-        self.requirement = self.check_params(vacancy_information, "snippet", "requirement")
-        self.experience = self.check_params(vacancy_information, "experience", "name")
-        self.employment = self.check_params(vacancy_information, "employment", "name")
+        self.id = vacancy_information["id"]
+        self.type = vacancy_information["type"]
+        self.name = vacancy_information["name"]
+        self.data_published = vacancy_information["data_published"]
+        self.salary_from = vacancy_information["salary_from"]
+        self.salary_to = vacancy_information["salary_to"]
+        self.currency = vacancy_information["currency"]
+        self.area = vacancy_information["area"]
+        self.url = vacancy_information["url"]
+        self.employer = vacancy_information["employer"]
+        self.employer_url = vacancy_information["employer_url"]
+        self.requirement = vacancy_information["requirement"]
+        self.experience = vacancy_information["experience"]
+        self.employment = vacancy_information["employment"]
+        self.salary_average = self.salary_average()
 
     def __str__(self):
         return f'''Vacancy - {self.name}
 Type - {self.type}
-Data published - {self.data_published}
+Data published - {datetime.datetime.fromtimestamp(self.data_published).strftime('%Y-%m-%d %H:%M:%S')}
 Employer - {self.employer}
 Salary - {self.salary_from} - {self.salary_to}
-Requirement - {self.requirement}
+Requirement - {self.requirement[:200]}
 Experience - {self.experience}
 Employment - {self.employment}
 Area - {self.area}
 Url - {self.url}
 
 '''
+
+    def salary_average(self):
+        if self.salary_from:
+            if self.salary_to:
+                result = int((self.salary_to + self.salary_from) / 2)
+            else:
+                result = self.salary_from
+        else:
+            if self.salary_to:
+                result = self.salary_to
+            else:
+                result = 0
+
+        return result
+
+    @classmethod
+    def create_vacancy_from_hh(cls, vacancy_info_hh):
+        result = {
+            "id": vacancy_info_hh["id"],
+            "website": 'HeadHunter',
+            "type": vacancy_info_hh["type"]["name"],
+            "name": vacancy_info_hh["name"],
+            "data_published": datetime.datetime.strptime(vacancy_info_hh["published_at"], '%Y-%m-%dT%H:%M:%S+%f').timestamp(),
+            "salary_from": cls.check_params(vacancy_info_hh, "salary", "from"),
+            "salary_to": cls.check_params(vacancy_info_hh, "salary", "to"),
+            "currency": cls.check_params(vacancy_info_hh,"salary", "currency"),
+            "area": vacancy_info_hh["area"]["name"],
+            "url": vacancy_info_hh["alternate_url"],
+            "employer": vacancy_info_hh["employer"]["name"],
+            "employer_url": vacancy_info_hh["employer"]["alternate_url"],
+            "requirement": vacancy_info_hh["snippet"]["requirement"],
+            "experience": vacancy_info_hh["experience"]["name"],
+            "employment": vacancy_info_hh["employment"]["name"]
+        }
+        return Vacancy(result)
+
+    @classmethod
+    def create_vacancy_from_sj(cls, vacancy_info_sj):
+        result ={
+            "id": vacancy_info_sj["id"],
+            "website": 'SupurJob',
+            "type": 'Открытая',
+            "name": vacancy_info_sj["profession"],
+            "data_published": vacancy_info_sj["date_published"],
+            "salary_from": vacancy_info_sj["payment_from"],
+            "salary_to": vacancy_info_sj["payment_to"],
+            "currency": vacancy_info_sj["currency"],
+            "area": vacancy_info_sj["client"]["town"]["title"],
+            "url": vacancy_info_sj["link"],
+            "employer": vacancy_info_sj["client"]["title"],
+            "employer_url": vacancy_info_sj["client"]["link"],
+            "requirement": vacancy_info_sj["candidat"],
+            "experience": vacancy_info_sj["experience"]["title"],
+            "employment": vacancy_info_sj["type_of_work"]["title"]
+        }
+        return Vacancy(result)
 
     @staticmethod
     def check_params(vacancy_information, param1, param2=None):
@@ -133,6 +204,9 @@ class Mylist:
     def __init__(self):
         self.vacancy_list = []
 
+    def __len__(self):
+        return len(self.vacancy_list)
+
     def add_vacancy(self, vacancy):
         self.vacancy_list.append(vacancy)
 
@@ -145,22 +219,11 @@ class Mylist:
         else:
             pass
 
-    def sorting_vacancies(self, param=None):
-        if param == 'data_published':
-            return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
-        elif param == 'salary_to':
-            none_list = []
-            all_list = self.vacancy_list.copy()
-            for vacancy in self.vacancy_list:
-                if vacancy.salary_to == None:
-                    all_list.remove(vacancy)
-                    none_list.append(vacancy)
-            result = sorted(all_list, reverse=True, key=lambda vacancy: vacancy.salary_to)
-            for vacancy in none_list:
-                result.append(vacancy)
-            return result
-        else:
-            return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+    def sorting_vacancies_data(self):
+        return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+
+    def sorting_vacancies_salary(self):
+        return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.salary_average)
 
     def __str__(self):
         result = ''
@@ -170,7 +233,7 @@ class Mylist:
             Data published - {item.data_published}
             Employer - {item.employer}
             Salary - {item.salary_from} - {item.salary_to}
-            Requirement - {item.requirement}
+            Requirement - {item.requirement[:200]}
             Experience - {item.experience}
             Employment - {item.employment}
             Area - {item.area}
