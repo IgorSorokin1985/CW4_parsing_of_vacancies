@@ -6,9 +6,9 @@ from src.classes import SuperJobAPI
 #    userinput = Userinput()
 #    userinput()
 
-sj = SuperJobAPI()
+#sj = SuperJobAPI()
 #sj.get_vacancies()
-sj.all_areas()
+#areas = sj.all_areas()
 
-#userinput = Userinput_2()
-#userinput()
+userinput = Userinput_2()
+userinput()

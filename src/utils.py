@@ -200,14 +200,29 @@ class Userinput_2:
             return False
 
     def research(self):
-        vacancies = self.hh_api.get_vacancies()
-        count = 1
-        for item in vacancies:
-            vacancy = Vacancy(item)
-            print(f'{count}\n{vacancy}')
-            count += 1
-            self.all_list.add_vacancy(vacancy)
-        self.sorting()
+        if 'HeadHunter' in self.param['website']:
+            if self.param['city'] != []:
+                self.hh_api.add_area(self.param['city'])
+            if self.param['words'] != []:
+                self.hh_api.add_words(self.param['words'])
+            vacancies_hh = self.hh_api.get_vacancies()
+        if 'SuperJob' in self.param['website']:
+            if self.param['city'] != []:
+                for item in range(len(self.param['city'])):
+                    self.sj_api.add_area(self.param['city'][item])
+            if self.param['words'] != []:
+                self.sj_api.add_words(self.param['words'])
+            vacancies_sj = self.sj_api.get_vacancies()
+            print(vacancies_sj)
+
+        #count = 1
+        #
+        #for item in vacancies:
+        #    vacancy = Vacancy(item)
+        #    print(f'{count}\n{vacancy}')
+        #    count += 1
+        #    self.all_list.add_vacancy(vacancy)
+        #self.sorting()
 
     def sorting(self):
         while True:

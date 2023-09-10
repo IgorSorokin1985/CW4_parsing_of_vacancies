@@ -14,12 +14,11 @@ class HeadHunterAPI:
         # print(json.dumps(response_data, indent=2, ensure_ascii=False))
         return response_data['items']
 
-    def add_text(self, text):
+    def add_words(self, text):
         self.params['text'] = text
 
     def add_area(self, city):
-        result = HeadHunterAPI.find_city_number(city)
-        self.params['area'] = result
+        self.params['area'] = self.areas[city]
 
     @staticmethod
     def find_city_number(city):
@@ -52,12 +51,14 @@ class SuperJobAPI:
 
     def __init__(self):
         self.params = {
-        'keyword': ['excel'],
-        'town': 397,
-        #'no_agreement': 1,
         'page': 0}
-        #self.areas = self.all_areas()
-        self.areas = {}
+        self.areas = self.all_areas()
+
+    def add_words(self, words):
+        self.params['keyword'] = words
+
+    def add_area(self, city):
+        self.params['town'] = self.areas[city]
 
     def get_vacancies(self):
         headers = {
@@ -67,37 +68,19 @@ class SuperJobAPI:
         response_data = json.loads(response.text)
         print(json.dumps(response_data, indent=2, ensure_ascii=False))
         print(len(response_data['objects']))
-        #return response_data['items']
-
-    def get_areas(self):
-        headers = {
-            'X-Api-App-Id': self.SJ_SPI_TOKIN
-        }
-        response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'page': 1})
-        response_data = json.loads(response.text)
-        print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        print(len(response_data['objects']))
-
+        return response_data['objects']
 
     def all_areas(self):
         headers = {
             'X-Api-App-Id': self.SJ_SPI_TOKIN
         }
-        page = 0
         result = {}
-        number_areas = 0
-        for i in range(10):
-            response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'page': page})
-            response_data = json.loads(response.text)
-            for area in response_data['objects']:
-                result[area["title"].lower()] = area["id"]
-            page += 1
-            number_areas += len(response_data['objects'])
-            print(number_areas)
-            if number_areas >= response_data["total"]:
-                break
-        print(result)
-        print(json.dumps(result, indent=2, ensure_ascii=False))
+        response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'id_country': 1, 'all': 1})
+        response_data = json.loads(response.text)
+        for area in response_data['objects']:
+            result[area["title"].lower()] = area["id"]
+        #print(json.dumps(result, indent=2, ensure_ascii=False))
+        return result
 
 class Vacancy:
     def __init__(self, vacancy_information):
