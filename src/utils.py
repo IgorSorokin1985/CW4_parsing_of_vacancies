@@ -1,4 +1,5 @@
 from src.classes import HeadHunterAPI, Vacancy, Mylist, SuperJobAPI
+import json
 
 class Userinput:
     def __init__(self):
@@ -202,10 +203,17 @@ class Userinput_2:
     def research(self):
         if 'HeadHunter' in self.param['website']:
             if self.param['city'] != []:
-                self.hh_api.add_area(self.param['city'])
+                for item in range(len(self.param['city'])):
+                    self.hh_api.add_area(self.param['city'][item])
             if self.param['words'] != []:
                 self.hh_api.add_words(self.param['words'])
             vacancies_hh = self.hh_api.get_vacancies()
+
+            for item in vacancies_hh:
+               vacancy = Vacancy.create_vacancy_from_hh(item)
+               print(vacancy)
+               self.all_list.add_vacancy(vacancy)
+
         if 'SuperJob' in self.param['website']:
             if self.param['city'] != []:
                 for item in range(len(self.param['city'])):
@@ -213,7 +221,11 @@ class Userinput_2:
             if self.param['words'] != []:
                 self.sj_api.add_words(self.param['words'])
             vacancies_sj = self.sj_api.get_vacancies()
-            print(vacancies_sj)
+            for item in vacancies_sj:
+               vacancy = Vacancy.create_vacancy_from_sj(item)
+               print(vacancy)
+               self.all_list.add_vacancy(vacancy)
+            #print(json.dumps(vacancies_sj, indent=2, ensure_ascii=False))
 
         #count = 1
         #
@@ -222,7 +234,7 @@ class Userinput_2:
         #    print(f'{count}\n{vacancy}')
         #    count += 1
         #    self.all_list.add_vacancy(vacancy)
-        #self.sorting()
+        self.sorting()
 
     def sorting(self):
         while True:

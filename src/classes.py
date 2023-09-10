@@ -11,7 +11,7 @@ class HeadHunterAPI:
     def get_vacancies(self):
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
-        # print(json.dumps(response_data, indent=2, ensure_ascii=False))
+        #print(json.dumps(response_data, indent=2, ensure_ascii=False))
         return response_data['items']
 
     def add_words(self, text):
@@ -66,8 +66,8 @@ class SuperJobAPI:
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
-        print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        print(len(response_data['objects']))
+        #print(json.dumps(response_data, indent=2, ensure_ascii=False))
+        #print(len(response_data['objects']))
         return response_data['objects']
 
     def all_areas(self):
@@ -84,20 +84,20 @@ class SuperJobAPI:
 
 class Vacancy:
     def __init__(self, vacancy_information):
-        self.id = self.check_params(vacancy_information,"id")
-        self.type = self.check_params(vacancy_information, "type", "name")
-        self.name = self.check_params(vacancy_information,"name")
-        self.data_published = self.check_params(vacancy_information, "published_at")
-        self.salary_from = self.check_params(vacancy_information, "salary", "from")
-        self.salary_to = self.check_params(vacancy_information, "salary", "to")
-        self.currency = self.check_params(vacancy_information, "salary", "currency")
-        self.area = self.check_params(vacancy_information, "area", "name")
-        self.url = self.check_params(vacancy_information, "alternate_url")
-        self.employer = self.check_params(vacancy_information, "employer", "name")
-        self.employer_url = self.check_params(vacancy_information, "employer", "alternate_url")
-        self.requirement = self.check_params(vacancy_information, "snippet", "requirement")
-        self.experience = self.check_params(vacancy_information, "experience", "name")
-        self.employment = self.check_params(vacancy_information, "employment", "name")
+        self.id = vacancy_information["id"]
+        self.type = vacancy_information["type"]
+        self.name = vacancy_information["name"]
+        self.data_published = vacancy_information["data_published"]
+        self.salary_from = vacancy_information["salary_from"]
+        self.salary_to = vacancy_information["salary_to"]
+        self.currency = vacancy_information["currency"]
+        self.area = vacancy_information["area"]
+        self.url = vacancy_information["url"]
+        self.employer = vacancy_information["employer"]
+        self.employer_url = vacancy_information["employer_url"]
+        self.requirement = vacancy_information["requirement"]
+        self.experience = vacancy_information["experience"]
+        self.employment = vacancy_information["employment"]
 
     def __str__(self):
         return f'''Vacancy - {self.name}
@@ -105,13 +105,55 @@ Type - {self.type}
 Data published - {self.data_published}
 Employer - {self.employer}
 Salary - {self.salary_from} - {self.salary_to}
-Requirement - {self.requirement}
+Requirement - {self.requirement[:200]}
 Experience - {self.experience}
 Employment - {self.employment}
 Area - {self.area}
 Url - {self.url}
 
 '''
+
+    @classmethod
+    def create_vacancy_from_hh(cls, vacancy_info_hh):
+        result = {
+            "id": vacancy_info_hh["id"],
+            "website": 'HeadHunter',
+            "type": vacancy_info_hh["type"]["name"],
+            "name": vacancy_info_hh["name"],
+            "data_published": vacancy_info_hh["published_at"],
+            "salary_from": cls.check_params(vacancy_info_hh, "salary", "from"),
+            "salary_to": cls.check_params(vacancy_info_hh, "salary", "to"),
+            "currency": cls.check_params(vacancy_info_hh,"salary", "currency"),
+            "area": vacancy_info_hh["area"]["name"],
+            "url": vacancy_info_hh["alternate_url"],
+            "employer": vacancy_info_hh["employer"]["name"],
+            "employer_url": vacancy_info_hh["employer"]["alternate_url"],
+            "requirement": vacancy_info_hh["snippet"]["requirement"],
+            "experience": vacancy_info_hh["experience"]["name"],
+            "employment": vacancy_info_hh["employment"]["name"]
+        }
+        return Vacancy(result)
+
+    @classmethod
+    def create_vacancy_from_sj(cls, vacancy_info_sj):
+        result ={
+            "id": vacancy_info_sj["id"],
+            "website": 'SupurJob',
+            "type": 'Открытая',
+            "name": vacancy_info_sj["profession"],
+            "data_published": vacancy_info_sj["date_published"],
+            "salary_from": vacancy_info_sj["payment_from"],
+            "salary_to": vacancy_info_sj["payment_to"],
+            "currency": vacancy_info_sj["currency"],
+            "area": vacancy_info_sj["client"]["town"]["title"],
+            "url": vacancy_info_sj["link"],
+            "employer": vacancy_info_sj["client"]["title"],
+            "employer_url": vacancy_info_sj["client"]["link"],
+            "requirement": vacancy_info_sj["candidat"],
+            "experience": vacancy_info_sj["experience"]["title"],
+            "employment": vacancy_info_sj["type_of_work"]["title"]
+        }
+        return Vacancy(result)
 
     @staticmethod
     def check_params(vacancy_information, param1, param2=None):
@@ -180,7 +222,7 @@ class Mylist:
             Data published - {item.data_published}
             Employer - {item.employer}
             Salary - {item.salary_from} - {item.salary_to}
-            Requirement - {item.requirement}
+            Requirement - {item.requirement[:200]}
             Experience - {item.experience}
             Employment - {item.employment}
             Area - {item.area}
