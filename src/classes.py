@@ -1,5 +1,6 @@
 import requests
 import json
+import datetime
 
 class HeadHunterAPI:
     HH_API_URL = 'https://api.hh.ru/vacancies'
@@ -12,7 +13,10 @@ class HeadHunterAPI:
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
         #print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        return response_data['items']
+        if 'items' in response_data:
+            return response_data['items']
+        else:
+            return []
 
     def add_words(self, text):
         self.params['text'] = text
@@ -68,7 +72,10 @@ class SuperJobAPI:
         response_data = json.loads(response.text)
         #print(json.dumps(response_data, indent=2, ensure_ascii=False))
         #print(len(response_data['objects']))
-        return response_data['objects']
+        if 'objects' in response_data:
+            return response_data['objects']
+        else:
+            return []
 
     def all_areas(self):
         headers = {
@@ -103,7 +110,7 @@ class Vacancy:
     def __str__(self):
         return f'''Vacancy - {self.name}
 Type - {self.type}
-Data published - {self.data_published}
+Data published - {datetime.datetime.fromtimestamp(self.data_published).strftime('%Y-%m-%d %H:%M:%S')}
 Employer - {self.employer}
 Salary - {self.salary_from} - {self.salary_to}
 Requirement - {self.requirement[:200]}
@@ -135,7 +142,7 @@ Url - {self.url}
             "website": 'HeadHunter',
             "type": vacancy_info_hh["type"]["name"],
             "name": vacancy_info_hh["name"],
-            "data_published": vacancy_info_hh["published_at"],
+            "data_published": datetime.datetime.strptime(vacancy_info_hh["published_at"], '%Y-%m-%dT%H:%M:%S+%f').timestamp(),
             "salary_from": cls.check_params(vacancy_info_hh, "salary", "from"),
             "salary_to": cls.check_params(vacancy_info_hh, "salary", "to"),
             "currency": cls.check_params(vacancy_info_hh,"salary", "currency"),
@@ -213,22 +220,6 @@ class Mylist:
             pass
 
     def sorting_vacancies_data(self):
-        #if param == 'data_published':
-        #    return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
-        #elif param == 'salary_to':
-        #    none_list = []
-        #    all_list = self.vacancy_list.copy()
-        #    for vacancy in self.vacancy_list:
-        #        if vacancy.salary_to == None:
-        #            all_list.remove(vacancy)
-        #            none_list.append(vacancy)
-        #    result = sorted(all_list, reverse=True, key=lambda vacancy: vacancy.salary_to)
-        #    for vacancy in none_list:
-        #        result.append(vacancy)
-        #    return result
-        #else:
-        #    return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
-
         return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
 
     def sorting_vacancies_salary(self):
