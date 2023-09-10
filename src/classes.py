@@ -98,6 +98,7 @@ class Vacancy:
         self.requirement = vacancy_information["requirement"]
         self.experience = vacancy_information["experience"]
         self.employment = vacancy_information["employment"]
+        self.salary_average = self.salary_average()
 
     def __str__(self):
         return f'''Vacancy - {self.name}
@@ -112,6 +113,20 @@ Area - {self.area}
 Url - {self.url}
 
 '''
+
+    def salary_average(self):
+        if self.salary_from:
+            if self.salary_to:
+                result = int((self.salary_to + self.salary_from) / 2)
+            else:
+                result = self.salary_from
+        else:
+            if self.salary_to:
+                result = self.salary_to
+            else:
+                result = 0
+
+        return result
 
     @classmethod
     def create_vacancy_from_hh(cls, vacancy_info_hh):
@@ -197,22 +212,27 @@ class Mylist:
         else:
             pass
 
-    def sorting_vacancies(self, param=None):
-        if param == 'data_published':
-            return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
-        elif param == 'salary_to':
-            none_list = []
-            all_list = self.vacancy_list.copy()
-            for vacancy in self.vacancy_list:
-                if vacancy.salary_to == None:
-                    all_list.remove(vacancy)
-                    none_list.append(vacancy)
-            result = sorted(all_list, reverse=True, key=lambda vacancy: vacancy.salary_to)
-            for vacancy in none_list:
-                result.append(vacancy)
-            return result
-        else:
-            return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+    def sorting_vacancies_data(self):
+        #if param == 'data_published':
+        #    return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+        #elif param == 'salary_to':
+        #    none_list = []
+        #    all_list = self.vacancy_list.copy()
+        #    for vacancy in self.vacancy_list:
+        #        if vacancy.salary_to == None:
+        #            all_list.remove(vacancy)
+        #            none_list.append(vacancy)
+        #    result = sorted(all_list, reverse=True, key=lambda vacancy: vacancy.salary_to)
+        #    for vacancy in none_list:
+        #        result.append(vacancy)
+        #    return result
+        #else:
+        #    return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+
+        return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.data_published)
+
+    def sorting_vacancies_salary(self):
+        return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.salary_average)
 
     def __str__(self):
         result = ''

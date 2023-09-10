@@ -134,14 +134,6 @@ class Userinput_2:
             else:
                 print('Unknown command')
 
-        vacancies = self.hh_api.get_vacancies()
-        count = 1
-        for item in vacancies:
-            vacancy = Vacancy(item)
-            print(f'{count}\n{vacancy}')
-            count += 1
-            self.all_list.add_vacancy(vacancy)
-
     def choosing_website(self):
         while True:
             print('We can research vacancies om HeadHunter and SuperJob. Which website you would like to choose?')
@@ -171,14 +163,16 @@ class Userinput_2:
             self.delete_dublicates()
             if self.param['words'] != []:
                 print(f"You choosed next words - {', '.join(self.param['words'])}")
-            print('Add word for researching or press 0 for Exit')
+            print('Add word for researching or "delete" for delete all words or press 0 for Exit')
             user_input = input().lower()
             if user_input == '0':
                 break
+            elif user_input == 'delete':
+                self.param['words'].clear()
+                break
             else:
                 self.param['words'].append(user_input)
-
-        #self.hh_api.add_text(word)
+                break
 
     def choosing_city(self):
         print('Add city for researching or press 0 for Exit')
@@ -227,38 +221,33 @@ class Userinput_2:
                self.all_list.add_vacancy(vacancy)
             #print(json.dumps(vacancies_sj, indent=2, ensure_ascii=False))
 
-        #count = 1
-        #
-        #for item in vacancies:
-        #    vacancy = Vacancy(item)
-        #    print(f'{count}\n{vacancy}')
-        #    count += 1
-        #    self.all_list.add_vacancy(vacancy)
         self.sorting()
 
     def sorting(self):
         while True:
             print(f'We found {len(self.all_list)} vacancies. We can sort or filter these. Choose what we should doing?')
-            print('1 - Sorting vacancies')
-            print('2 - Filter')
-            print('3 - Go to show vacancies and add in your favorite list')
+            print('1 - Sorting vacancies on data')
+            print('2 - Sorting vacancies on salary')
+            print('3 - Filter')
+            print('4 - Go to show vacancies and add in your favorite list')
 
             user_input = input()
 
             if user_input == '0':
                 break
             elif user_input == '1':
-                for item in self.mylist.sorting_vacancies('salary_to'):
+                for item in self.all_list.sorting_vacancies_data():
                     print(item)
             elif user_input == '2':
-                pass
-            elif user_input == '3':
+                for item in self.all_list.sorting_vacancies_salary():
+                    print(item)
+            elif user_input == '4':
                 self.showing()
             else:
                 print('Unknown command')
 
     def showing(self):
-        print(self.mylist)
+        print(self.all_list)
 
     def choosing_vacancies(self):
         numbers_vacancies = input('Which vacancies are you choose? Write number.')
