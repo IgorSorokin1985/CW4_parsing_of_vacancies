@@ -186,8 +186,6 @@ class Userinput_2:
             else:
                 print('Try again. Because we did not find this city or press 0 for Exit')
 
-        #self.hh_api.add_area(city)
-
     def check_city(self, user_input):
         if user_input in self.hh_api.areas or user_input in self.sj_api.areas:
             return True
@@ -231,8 +229,10 @@ class Userinput_2:
             print(f'We found {len(self.all_list)} vacancies. We can sort or filter these. Choose what we should doing?')
             print('1 - Sorting vacancies on data')
             print('2 - Sorting vacancies on salary')
-            print('3 - Filter')
-            print('4 - Go to show vacancies and add in your favorite list')
+            print('3 - Filter word')
+            print('4 - Filter salary')
+            print('5 - Go to show vacancies and add in your favorite list')
+            print('0 - Exit')
 
             user_input = input()
 
@@ -244,7 +244,21 @@ class Userinput_2:
             elif user_input == '2':
                 for item in self.all_list.sorting_vacancies_salary():
                     print(item)
+            elif user_input == '3':
+                print('Which word we should use for filtering?')
+                word_filter = input().lower()
+                self.all_list.filter_list_word(word_filter)
             elif user_input == '4':
+                print('Which salary we should use for filtering?')
+                while True:
+                    salary = input()
+                    if salary.isdigit():
+                        self.all_list.filter_list_salary(int(salary))
+                        break
+                    else:
+                        print('Incorrect salary')
+
+            elif user_input == '5':
                 self.showing()
             else:
                 print('Unknown command')

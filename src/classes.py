@@ -225,19 +225,22 @@ class Mylist:
     def sorting_vacancies_salary(self):
         return sorted(self.vacancy_list, reverse=True, key=lambda vacancy: vacancy.salary_average)
 
+    def filter_list_word(self, word):
+        for vacancy in self.vacancy_list:
+            if word in vacancy.requirement or word in vacancy.name:
+                pass
+            else:
+                self.vacancy_list.remove(vacancy)
+        return self
+
+    def filter_list_salary(self, salary):
+        for vacancy in self.vacancy_list:
+            if vacancy.salary_average >= salary:
+                pass
+            else:
+                self.vacancy_list.remove(vacancy)
+        return self
+
     def __str__(self):
-        result = ''
-        for item in self.vacancy_list:
-            result += f'''Vacancy - {item.name}
-            Type - {item.type}
-            Data published - {item.data_published}
-            Employer - {item.employer}
-            Salary - {item.salary_from} - {item.salary_to}
-            Requirement - {item.requirement[:200]}
-            Experience - {item.experience}
-            Employment - {item.employment}
-            Area - {item.area}
-            Url - {item.url}
-    
-            '''
+        result = '\n'.join([f'Vacancy N {index+1}\n{vacancy.__str__()}' for index, vacancy in enumerate(self.vacancy_list)])
         return result
