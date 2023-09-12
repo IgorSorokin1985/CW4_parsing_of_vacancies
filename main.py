@@ -1,6 +1,5 @@
-from src.utils import Userinput, Userinput_2
-from src.classes import SuperJobAPI
+from src.utils import Userinput
 
 if __name__ == "__main__":
-    userinput = Userinput_2()
+    userinput = Userinput()
     userinput()
