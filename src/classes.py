@@ -1,12 +1,16 @@
 import requests
 import json
 import datetime
+import time
 
 class HeadHunterAPI:
     HH_API_URL = 'https://api.hh.ru/vacancies'
     HH_API_URL_AREAS = 'https://api.hh.ru/areas'
     def __init__(self):
-        self.params = {'per_page': 10}
+        self.params = {
+            'per_page': 100,
+        }
+        self.change_date()
         self.areas = self.all_areas()
 
     def get_vacancies(self):
@@ -17,6 +21,9 @@ class HeadHunterAPI:
             return response_data['items']
         else:
             return []
+
+    def change_date(self, days=14):
+        self.params['period'] = days
 
     def add_words(self, text):
         self.params['text'] = text
@@ -55,8 +62,16 @@ class SuperJobAPI:
 
     def __init__(self):
         self.params = {
-        'page': 0}
+        'count': 100,
+        'page': 0
+        }
+        self.change_date()
         self.areas = self.all_areas()
+
+    def change_date(self, days=14):
+        search_from = datetime.datetime.now() - datetime.timedelta(days=days)
+        unix_time = int(time.mktime(search_from.timetuple()))
+        self.params['date_published_from'] = unix_time
 
     def add_words(self, words):
         self.params['keyword'] = words
@@ -70,8 +85,6 @@ class SuperJobAPI:
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
-        #print(json.dumps(response_data, indent=2, ensure_ascii=False))
-        #print(len(response_data['objects']))
         if 'objects' in response_data:
             return response_data['objects']
         else:
@@ -86,7 +99,7 @@ class SuperJobAPI:
         response_data = json.loads(response.text)
         for area in response_data['objects']:
             result[area["title"].lower()] = area["id"]
-        #print(json.dumps(result, indent=2, ensure_ascii=False))
+
         return result
 
 class Vacancy:
@@ -241,6 +254,8 @@ class Mylist:
                 self.vacancy_list.remove(vacancy)
         return self
 
+    def save_csv(self):
+        pass
+
     def __str__(self):
-        result = '\n'.join([f'Vacancy N {index+1}\n{vacancy.__str__()}' for index, vacancy in enumerate(self.vacancy_list)])
-        return result
+        return '\n'.join([f'Vacancy N {index+1}\n{vacancy.__str__()}' for index, vacancy in enumerate(self.vacancy_list)])
