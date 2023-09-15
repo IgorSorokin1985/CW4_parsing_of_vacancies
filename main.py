@@ -1,9 +1,9 @@
-from src.utils import Userinput
+from src.class_userinput import Userinput
 from src.telegram_bot import Userinput_telebot
 
-#if __name__ == "__main__":
-#    userinput = Userinput()
-#    userinput()
+if __name__ == "__main__":
+    userinput = Userinput()
+    userinput()
 
-userinput_telebot = Userinput_telebot()
-userinput_telebot()
+#userinput_telebot = Userinput_telebot()
+#userinput_telebot()
