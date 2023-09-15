@@ -8,6 +8,9 @@ class Mylist:
     def __len__(self):
         return len(self.vacancy_list)
 
+    def clear_list(self):
+        self.vacancy_list.clear()
+
     def add_vacancy(self, vacancy):
         self.vacancy_list.append(vacancy)
 
