@@ -9,6 +9,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import os
 
 class Userinput_telebot:
     new_param = {
@@ -17,7 +18,8 @@ class Userinput_telebot:
             'words': [],
             'date': 14
         }
-    TOKEN = '6383243823:AAFSYPjuFJYtgY-Pbn7yg0mELtHu_X-eGfA'
+
+    TOKEN: str = os.getenv('TELEBOT_TOKEN')
     def __init__(self):
         self.hh_api = HeadHunterAPI()
         self.sj_api = SuperJobAPI()
