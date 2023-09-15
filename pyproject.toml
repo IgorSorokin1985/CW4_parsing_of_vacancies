@@ -10,6 +10,7 @@ packages = [{include = "cw4_parsing_of_vacancies"}]
 python = "^3.10"
 requests = "^2.31.0"
 datetime = "^5.2"
+aiogram = "^3.0.0"
 
 
 [build-system]
