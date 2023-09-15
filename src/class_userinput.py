@@ -1,5 +1,7 @@
-from src.classes import HeadHunterAPI, Vacancy, Mylist, SuperJobAPI
+from src.classes_api import HeadHunterAPI, SuperJobAPI
+from src.class_mylist import Mylist
 import json
+from src.class_vacancy import Vacancy
 
 class Userinput:
     new_param = {

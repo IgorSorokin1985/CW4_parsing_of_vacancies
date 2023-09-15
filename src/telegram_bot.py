@@ -1,5 +1,7 @@
-from src.classes import HeadHunterAPI, Vacancy, Mylist, SuperJobAPI
+from src.classes_api import HeadHunterAPI, SuperJobAPI
 import json
+from src.class_vacancy import Vacancy
+from src.class_mylist import Mylist
 from aiogram import Bot, types, Dispatcher
 from aiogram.utils import executor
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
