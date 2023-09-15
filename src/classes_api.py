@@ -3,7 +3,7 @@ import requests
 import json
 import datetime
 import time
-
+import os
 
 class API(ABC):
 
@@ -72,8 +72,7 @@ class HeadHunterAPI(API):
 class SuperJobAPI(API):
     SJ_API_URL = 'https://api.superjob.ru/2.0/vacancies/'
     SJ_API_URL_AREAS = 'https://api.superjob.ru/2.0/towns/'
-    SJ_SPI_TOKIN = 'v3.r.137807815.17181db4d5258989a59988d60bd12edf13ee0a71.bed98dc22a081d987b5c629d7799d55d36f58bb9'
-
+    SJ_SPI_TOKEN: str = os.getenv('SJ_SPI_TOKEN')
     def __init__(self):
         self.params = {
         'count': 100,
@@ -95,7 +94,7 @@ class SuperJobAPI(API):
 
     def get_vacancies(self):
         headers = {
-            'X-Api-App-Id': self.SJ_SPI_TOKIN
+            'X-Api-App-Id': self.SJ_SPI_TOKEN
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
@@ -106,7 +105,7 @@ class SuperJobAPI(API):
 
     def all_areas(self):
         headers = {
-            'X-Api-App-Id': self.SJ_SPI_TOKIN
+            'X-Api-App-Id': self.SJ_SPI_TOKEN
         }
         result = {}
         response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'id_country': 1, 'all': 1})
