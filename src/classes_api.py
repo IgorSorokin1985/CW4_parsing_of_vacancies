@@ -30,16 +30,18 @@ class API(ABC):
 class HeadHunterAPI(API):
     HH_API_URL = 'https://api.hh.ru/vacancies'
     HH_API_URL_AREAS = 'https://api.hh.ru/areas'
+    params_zero = {
+        'per_page': 100,
+    }
     def __init__(self):
-        self.params = {
-            'per_page': 100,
-        }
+        self.params = self.params_zero
         self.change_date()
         self.areas = self.all_areas()
 
     def get_vacancies(self):
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
+        self.params = self.params_zero
         if 'items' in response_data:
             return response_data['items']
         else:
@@ -62,10 +64,10 @@ class HeadHunterAPI(API):
         areas = {}
         for k in dict_areas:
             for i in range(len(k['areas'])):
-                if len(k['areas'][i]['areas']) != 0:  # Если у зоны есть внутренние зоны
+                if len(k['areas'][i]['areas']) != 0:
                     for j in range(len(k['areas'][i]['areas'])):
                         areas[k['areas'][i]['areas'][j]['name'].lower()] = k['areas'][i]['areas'][j]['id']
-                else:  # Если у зоны нет внутренних зон
+                else:
                     areas[k['areas'][i]['name'].lower()] = k['areas'][i]['id']
         return areas
 
@@ -73,11 +75,12 @@ class SuperJobAPI(API):
     SJ_API_URL = 'https://api.superjob.ru/2.0/vacancies/'
     SJ_API_URL_AREAS = 'https://api.superjob.ru/2.0/towns/'
     SJ_SPI_TOKEN: str = os.getenv('SJ_SPI_TOKEN')
-    def __init__(self):
-        self.params = {
+    params_zero = {
         'count': 100,
         'page': 0
-        }
+    }
+    def __init__(self):
+        self.params = self.params_zero
         self.change_date()
         self.areas = self.all_areas()
 
@@ -98,6 +101,7 @@ class SuperJobAPI(API):
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
+        self.params = self.params_zero
         if 'objects' in response_data:
             return response_data['objects']
         else:
@@ -114,9 +118,3 @@ class SuperJobAPI(API):
             result[area["title"].lower()] = area["id"]
 
         return result
-
-class JSONSaver:
-    pass
-
-class CSVSaver:
-    pass

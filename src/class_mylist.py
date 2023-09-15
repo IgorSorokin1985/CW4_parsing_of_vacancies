@@ -1,7 +1,9 @@
+from src.class_save_csv import CSVSaver
 
 class Mylist:
     def __init__(self):
         self.vacancy_list = []
+        self.csv_saver = CSVSaver()
 
     def __len__(self):
         return len(self.vacancy_list)
@@ -41,7 +43,8 @@ class Mylist:
         return self
 
     def save_csv(self):
-        pass
+        path = self.csv_saver.save_vacancies(self.vacancy_list)
+        return path
 
     def __str__(self):
         return '\n'.join([f'Vacancy N {index+1}\n{vacancy.__str__()}' for index, vacancy in enumerate(self.vacancy_list)])

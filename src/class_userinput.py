@@ -186,7 +186,6 @@ class Userinput:
                 for item in vacancies_sj:
                    vacancy = Vacancy.create_vacancy_from_sj(item)
                    self.all_list.add_vacancy(vacancy)
-            #print(json.dumps(vacancies_sj, indent=2, ensure_ascii=False))
 
         self.sorting()
 
@@ -271,8 +270,8 @@ class Userinput:
             if user_input == '0':
                 self.__call__()
             elif user_input == '1':
-                self.mylist.save_csv()
-                print('Your favorite vacancies were saved in CSV file')
+                path = self.mylist.save_csv()
+                print(f'Your favorite vacancies were saved in CSV file - {path}')
                 self.__call__()
             elif user_input == '2':
                 print(self.mylist)
