@@ -4,6 +4,7 @@ import json
 import datetime
 import time
 import os
+from src.class_save_json import JSONSaver_Areas
 
 class API(ABC):
 
@@ -24,22 +25,30 @@ class API(ABC):
         pass
 
     @abstractmethod
-    def all_areas(self):
+    def load_all_areas(self):
         pass
 
 class HeadHunterAPI(API):
     HH_API_URL = 'https://api.hh.ru/vacancies'
     HH_API_URL_AREAS = 'https://api.hh.ru/areas'
+    HH_AREAS_JSON = 'data/areas/headhunter_areas.json'
+    params_zero = {
+        'per_page': 100,
+    }
+
     def __init__(self):
-        self.params = {
-            'per_page': 100,
-        }
+        self.params = self.params_zero
         self.change_date()
-        self.areas = self.all_areas()
+        self.saver_areas = JSONSaver_Areas(self.HH_AREAS_JSON)
+        if self.saver_areas.check_file():
+            pass
+        else:
+            self.load_all_areas()
 
     def get_vacancies(self):
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
+        self.params = self.params_zero
         if 'items' in response_data:
             return response_data['items']
         else:
@@ -52,9 +61,9 @@ class HeadHunterAPI(API):
         self.params['text'] = text
 
     def add_area(self, city):
-        self.params['area'] = self.areas[city]
+        self.params['area'] = self.saver_areas.open_and_find_info(city)
 
-    def all_areas(self):
+    def load_all_areas(self):
         req = requests.get(HeadHunterAPI.HH_API_URL_AREAS)
         data = req.content.decode()
         req.close()
@@ -62,24 +71,31 @@ class HeadHunterAPI(API):
         areas = {}
         for k in dict_areas:
             for i in range(len(k['areas'])):
-                if len(k['areas'][i]['areas']) != 0:  # Если у зоны есть внутренние зоны
+                if len(k['areas'][i]['areas']) != 0:
                     for j in range(len(k['areas'][i]['areas'])):
                         areas[k['areas'][i]['areas'][j]['name'].lower()] = k['areas'][i]['areas'][j]['id']
-                else:  # Если у зоны нет внутренних зон
+                else:
                     areas[k['areas'][i]['name'].lower()] = k['areas'][i]['id']
-        return areas
+        self.saver_areas.save_file(areas)
 
 class SuperJobAPI(API):
     SJ_API_URL = 'https://api.superjob.ru/2.0/vacancies/'
     SJ_API_URL_AREAS = 'https://api.superjob.ru/2.0/towns/'
     SJ_SPI_TOKEN: str = os.getenv('SJ_SPI_TOKEN')
-    def __init__(self):
-        self.params = {
+    SJ_AREAS_JSON = 'data/areas/superjob_areas.json'
+    params_zero = {
         'count': 100,
         'page': 0
-        }
+    }
+
+    def __init__(self):
+        self.params = self.params_zero
         self.change_date()
-        self.areas = self.all_areas()
+        self.saver_areas = JSONSaver_Areas(self.SJ_AREAS_JSON)
+        if self.saver_areas.check_file():
+            pass
+        else:
+            self.load_all_areas()
 
     def change_date(self, days=14):
         search_from = datetime.datetime.now() - datetime.timedelta(days=days)
@@ -90,7 +106,7 @@ class SuperJobAPI(API):
         self.params['keyword'] = words
 
     def add_area(self, city):
-        self.params['town'] = self.areas[city]
+        self.params['town'] = self.saver_areas.open_and_find_info(city)
 
     def get_vacancies(self):
         headers = {
@@ -98,12 +114,13 @@ class SuperJobAPI(API):
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
+        self.params = self.params_zero
         if 'objects' in response_data:
             return response_data['objects']
         else:
             return []
 
-    def all_areas(self):
+    def load_all_areas(self):
         headers = {
             'X-Api-App-Id': self.SJ_SPI_TOKEN
         }
@@ -113,10 +130,4 @@ class SuperJobAPI(API):
         for area in response_data['objects']:
             result[area["title"].lower()] = area["id"]
 
-        return result
-
-class JSONSaver:
-    pass
-
-class CSVSaver:
-    pass
+        self.saver_areas.save_file(result)
