@@ -17,7 +17,7 @@ class API(ABC):
         pass
 
     @abstractmethod
-    def add_words(self, text):
+    def add_words(self, words):
         pass
 
     @abstractmethod
@@ -29,6 +29,9 @@ class API(ABC):
         pass
 
 class HeadHunterAPI(API):
+    """
+    This class for getting information from headhanter API
+    """
     HH_API_URL = 'https://api.hh.ru/vacancies'
     HH_API_URL_AREAS = 'https://api.hh.ru/areas'
     HH_AREAS_JSON = 'data/areas/headhunter_areas.json'
@@ -46,6 +49,10 @@ class HeadHunterAPI(API):
             self.load_all_areas()
 
     def get_vacancies(self):
+        """
+        Getting information about vacancies with params.
+        :return: dict
+        """
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
         self.params = self.params_zero
@@ -54,16 +61,35 @@ class HeadHunterAPI(API):
         else:
             return []
 
-    def change_date(self, days=14):
+    def change_date(self, days: int =14):
+        """
+        Changing number of days for research. Default - number = 14 days
+        :param days: number of days or research
+        :return: None
+        """
         self.params['period'] = days
 
-    def add_words(self, text):
-        self.params['text'] = text
+    def add_words(self, words: list):
+        """
+        Adding word for research.
+        :param text: list
+        :return: None
+        """
+        self.params['text'] = words
 
-    def add_area(self, city):
+    def add_area(self, city: str):
+        """
+        Adding city for research.
+        :param city: str
+        :return: index of city
+        """
         self.params['area'] = self.saver_areas.open_and_find_info(city)
 
     def load_all_areas(self):
+        """
+        This function for loadind all areas headhunter and saving JSON-file
+        :return: None
+        """
         req = requests.get(HeadHunterAPI.HH_API_URL_AREAS)
         data = req.content.decode()
         req.close()
@@ -97,18 +123,37 @@ class SuperJobAPI(API):
         else:
             self.load_all_areas()
 
-    def change_date(self, days=14):
+    def change_date(self, days: int =14):
+        """
+        Changing number of days for research. Default - number = 14 days
+        :param days: number of days or research
+        :return: None
+        """
         search_from = datetime.datetime.now() - datetime.timedelta(days=days)
         unix_time = int(time.mktime(search_from.timetuple()))
         self.params['date_published_from'] = unix_time
 
-    def add_words(self, words):
+    def add_words(self, words: list):
+        """
+        Adding word for research.
+        :param text: list
+        :return: None
+        """
         self.params['keyword'] = words
 
-    def add_area(self, city):
+    def add_area(self, city: str):
+        """
+        Adding city for research.
+        :param city: str
+        :return: index of city
+        """
         self.params['town'] = self.saver_areas.open_and_find_info(city)
 
     def get_vacancies(self):
+        """
+        Getting information about vacancies with params.
+        :return: dict
+        """
         headers = {
             'X-Api-App-Id': self.SJ_SPI_TOKEN
         }
@@ -121,6 +166,10 @@ class SuperJobAPI(API):
             return []
 
     def load_all_areas(self):
+        """
+        This function for loadind all areas headhunter and saving JSON-file
+        :return: None
+        """
         headers = {
             'X-Api-App-Id': self.SJ_SPI_TOKEN
         }
