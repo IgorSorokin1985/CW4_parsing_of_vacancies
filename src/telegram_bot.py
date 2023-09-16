@@ -122,6 +122,7 @@ class Userinput_telebot:
             await Data_reserch.next()
             for index, vacancy in enumerate(self.all_list.vacancy_list[:10]):
                 await self.bot.send_message(message.from_user.id, f'Vacancy N {index+1}\n{vacancy.__str__()}!', reply_markup=kb_client_1)
+            self.all_list.clear_list()
 
 
         @self.dp.message_handler()
