@@ -55,7 +55,7 @@ class HeadHunterAPI(API):
         """
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
-        self.params = self.params_zero
+        self.params = self.params_zero.copy()
         if 'items' in response_data:
             return response_data['items']
         else:
@@ -107,7 +107,7 @@ class HeadHunterAPI(API):
 class SuperJobAPI(API):
     SJ_API_URL = 'https://api.superjob.ru/2.0/vacancies/'
     SJ_API_URL_AREAS = 'https://api.superjob.ru/2.0/towns/'
-    SJ_SPI_TOKEN: str = os.getenv('SJ_SPI_TOKEN')
+    SJ_API_TOKEN: str = os.getenv('SJ_API_TOKEN')
     SJ_AREAS_JSON = 'data/areas/superjob_areas.json'
     params_zero = {
         'count': 100,
@@ -155,11 +155,11 @@ class SuperJobAPI(API):
         :return: dict
         """
         headers = {
-            'X-Api-App-Id': self.SJ_SPI_TOKEN
+            'X-Api-App-Id': self.SJ_API_TOKEN
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
-        self.params = self.params_zero
+        self.params = self.params_zero.copy()
         if 'objects' in response_data:
             return response_data['objects']
         else:
@@ -171,7 +171,7 @@ class SuperJobAPI(API):
         :return: None
         """
         headers = {
-            'X-Api-App-Id': self.SJ_SPI_TOKEN
+            'X-Api-App-Id': self.SJ_API_TOKEN
         }
         result = {}
         response = requests.get(self.SJ_API_URL_AREAS, headers=headers, params={'id_country': 1, 'all': 1})

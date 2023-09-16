@@ -1,4 +1,4 @@
-from src.class_save_csv import CSVSaver
+from src.class_save_csv import Saver
 
 class Mylist:
     """
@@ -6,7 +6,7 @@ class Mylist:
     """
     def __init__(self):
         self.vacancy_list = []
-        self.csv_saver = CSVSaver()
+        self.csv_saver = Saver()
 
     def __len__(self):
         return len(self.vacancy_list)
@@ -90,7 +90,15 @@ class Mylist:
         Saving vacancies in list in CSV-file
         :return: path of file
         """
-        path = self.csv_saver.save_vacancies(self.vacancy_list)
+        path = self.csv_saver.save_vacancies_csv(self.vacancy_list)
+        return path
+
+    def save_xlsx(self):
+        """
+        Saving vacancies in list in CSV-file
+        :return: path of file
+        """
+        path = self.csv_saver.save_vacancies_xlsx(self.vacancy_list)
         return path
 
     def __str__(self):
