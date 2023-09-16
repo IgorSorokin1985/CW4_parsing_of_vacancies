@@ -2,11 +2,19 @@ import csv
 import datetime
 
 class CSVSaver:
+    """
+    This class for saving vacancies in CSV-file
+    """
 
     def __init__(self):
         pass
 
-    def save_vacancies(self, vacancies):
+    def save_vacancies(self, vacancies: list):
+        """
+        Saving information about vacancies in CSV-file
+        :param vacancies: list of objects Vacancy
+        :return: path file
+        """
         path = self.get_path()
         with open(path, 'w', newline='') as file:
             writer = csv.writer(file, delimiter=';')
@@ -18,6 +26,10 @@ class CSVSaver:
         return path
 
     def get_path(self):
+        """
+        Getting path new file using date and time now.
+        :return: path of new file
+        """
         data_now = datetime.datetime.now()
         result = 'data/research/' + str(data_now)[:19] + ' vacancies.csv'
         return result
