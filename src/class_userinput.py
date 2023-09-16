@@ -18,7 +18,7 @@ class Userinput:
         self.sj_api = SuperJobAPI()
         self.all_list = Mylist()
         self.mylist = Mylist()
-        self.param = self.new_param
+        self.param = self.new_param.copy()
 
     def __call__(self):
         """
@@ -64,7 +64,8 @@ class Userinput:
             print('2 - add words for research')
             print('3 - choose city')
             print('4 - change the search date (by default, the last 14 days)')
-            print('5 - research vacancies')
+            if self.param['website'] != [] and self.param['city'] != [] and self.param['words'] != []:
+                print('5 - research vacancies')
             print('0 - Exit')
             user_input = input()
 
@@ -223,6 +224,8 @@ class Userinput:
                    vacancy = Vacancy.create_vacancy_from_sj(item)
                    self.all_list.add_vacancy(vacancy)
 
+        self.param = self.new_param.copy()
+
         self.sorting_vacancies()
 
     def sorting_vacancies(self):
@@ -238,7 +241,8 @@ class Userinput:
             print('4 - Filter salary')
             print('5 - Show all vacancies')
             print('6 - Save all vacancies in CSV-file')
-            print('7 - Go to showing vacancies and adding in your favorite list')
+            print('7 - Save all vacancies in XLSX-file')
+            print('8 - Go to showing vacancies and adding in your favorite list')
             print('0 - Exit')
 
             user_input = input()
@@ -273,6 +277,10 @@ class Userinput:
                 print(f'Your favorite vacancies were saved in CSV-file - {path}')
                 self.__call__()
             elif user_input == '7':
+                path = self.all_list.save_xlsx()
+                print(f'Your favorite vacancies were saved in XLSX-file - {path}')
+                self.__call__()
+            elif user_input == '8':
                 self.showing_all_list_vacancies()
                 self.choosing_vacancies_in_my_list()
             else:
@@ -325,8 +333,9 @@ class Userinput:
         while True:
             print(f'We added {len(self.mylist)} vacancies. We can save these or we can vake new research. Choose what we should doing?')
             print('1 - Save my favorite vacancies in CSV file')
-            print('2 - Print my favorite vacancies')
-            print('3 - New research')
+            print('2 - Save my favorite vacancies in XLSX file')
+            print('3 - Print my favorite vacancies')
+            print('4 - New research')
             print('0 - Exit')
 
             user_input = input()
@@ -338,8 +347,12 @@ class Userinput:
                 print(f'Your favorite vacancies were saved in CSV-file - {path}')
                 self.__call__()
             elif user_input == '2':
-                print(self.mylist)
+                path = self.mylist.save_xlsx()
+                print(f'Your favorite vacancies were saved in XLSX-file - {path}')
+                self.__call__()
             elif user_input == '3':
+                print(self.mylist)
+            elif user_input == '4':
                 self.choosing_parameters()
             else:
                 print('Unknown command')

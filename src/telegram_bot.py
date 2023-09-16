@@ -1,12 +1,10 @@
 from src.classes_api import HeadHunterAPI, SuperJobAPI
-import json
 from src.class_vacancy import Vacancy
 from src.class_mylist import Mylist
 from aiogram import Bot, types, Dispatcher
 from aiogram.utils import executor
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import os
@@ -25,7 +23,7 @@ class Userinput_telebot:
         self.hh_api = HeadHunterAPI()
         self.sj_api = SuperJobAPI()
         self.all_list = Mylist()
-        self.param = self.new_param
+        self.param = self.new_param.copy()
         self.bot = Bot(self.TOKEN)
         self.dp = Dispatcher(self.bot, storage=MemoryStorage())
 
@@ -86,6 +84,9 @@ class Userinput_telebot:
             elif message.text == '/HeadHunter_and_SuperJob':
                 self.param['website'].append('HeadHunter')
                 self.param['website'].append('SuperJob')
+            else:
+                self.param['website'].append('HeadHunter')
+                self.param['website'].append('SuperJob')
 
             await Data_reserch.next()
             await message.reply('Add word for researching', reply_markup=ReplyKeyboardRemove())
@@ -95,13 +96,19 @@ class Userinput_telebot:
             async with state.proxy() as data:
                 self.param['words'].append(message.text.lower())
             await Data_reserch.next()
-            await message.reply('Add city for researching')
+            await message.reply('Add city for researching (on russian)')
 
         @self.dp.message_handler(state=Data_reserch.add_city)
         async def input_city(message: types.Message):
-            self.param['city'].append(message.text.lower())
-            await Data_reserch.next()
-            await message.reply('Choose number of days for research', reply_markup=kb_client_3)
+
+            if self.check_city(message.text.lower()):
+                self.param['city'].append(message.text.lower())
+                await Data_reserch.next()
+                await message.reply('Choose number of days for research', reply_markup=kb_client_3)
+            else:
+
+                await message.reply('Add city for researching (on russian)')
+
 
         @self.dp.message_handler(state=Data_reserch.choose_number_days)
         async def input_text4(message: types.Message):
@@ -133,11 +140,12 @@ class Userinput_telebot:
             for index, vacancy in enumerate(self.all_list.vacancy_list[:10]):
                 await self.bot.send_message(message.from_user.id, f'Vacancy N {index+1}\nName - {vacancy.name}\nUrl - {vacancy.url}', reply_markup=kb_client_1)
 
-            path = self.all_list.save_csv()
+            path = self.all_list.save_xlsx()
+
             await message.reply_document(open(path, 'rb'))
 
             await self.bot.send_message(message.from_user.id,
-                                        f'I showed few vacancies late, if file all vacancies. Coding "windows-1251"',
+                                        f'I showed few vacancies late, in file all vacancies.',
                                         reply_markup=kb_client_1)
 
             self.all_list.clear_list()
@@ -180,10 +188,15 @@ class Userinput_telebot:
                     vacancy = Vacancy.create_vacancy_from_sj(item)
                     self.all_list.add_vacancy(vacancy)
 
-        self.param = {
-            'website': [],
-            'city': [],
-            'words': [],
-            'date': 14
-        }
+        self.param = self.new_param.copy()
 
+    def check_city(self, user_input:str):
+        """
+        Checking city from user
+        :param user_input: str
+        :return: True or False
+        """
+        if self.hh_api.saver_areas.open_and_find_info(user_input) or self.sj_api.saver_areas.open_and_find_info(user_input):
+            return True
+        else:
+            return False

@@ -107,7 +107,7 @@ class HeadHunterAPI(API):
 class SuperJobAPI(API):
     SJ_API_URL = 'https://api.superjob.ru/2.0/vacancies/'
     SJ_API_URL_AREAS = 'https://api.superjob.ru/2.0/towns/'
-    SJ_SPI_TOKEN: str = os.getenv('SJ_SPI_TOKEN')
+    SJ_API_TOKEN: str = os.getenv('SJ_SPI_TOKEN')
     SJ_AREAS_JSON = 'data/areas/superjob_areas.json'
     params_zero = {
         'count': 100,
