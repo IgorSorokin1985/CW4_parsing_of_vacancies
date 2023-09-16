@@ -3,12 +3,16 @@ from src.class_mylist import Mylist
 from src.class_vacancy import Vacancy
 
 class Userinput:
+    """
+    This class is for user interaction in console.
+    """
     new_param = {
             'website': [],
             'city': [],
             'words': [],
             'date': 14
         }
+
     def __init__(self):
         self.hh_api = HeadHunterAPI()
         self.sj_api = SuperJobAPI()
@@ -17,6 +21,10 @@ class Userinput:
         self.param = self.new_param
 
     def __call__(self):
+        """
+        First menu fo user.
+        :return: None
+        """
         while True:
             print('Commands:')
             print('1 - Research vacancies')
@@ -37,9 +45,13 @@ class Userinput:
                 print('Unknown command')
 
     def choosing_parameters(self):
+        """
+        Second menu for choosing research's parameters
+        :return: None
+        """
         self.param = self.new_param
         while True:
-            self.delete_dublicates()
+            self.delete_duplicates()
             print('You need choose websites, city, date and words for research')
             print(f'We are looking for vacancies in the last {self.param["date"]} days')
             if self.param['website'] != []:
@@ -72,6 +84,10 @@ class Userinput:
                 print('Unknown command')
 
     def choosing_website(self):
+        """
+        Menu for choosing websites
+        :return: None
+        """
         while True:
             print('We can research vacancies om HeadHunter and SuperJob. Which website you would like to choose?')
             print('1 - HeadHunter')
@@ -96,8 +112,12 @@ class Userinput:
                 print('Unknown command')
 
     def choosing_words(self):
+        """
+        Menu for add and delete word for researching
+        :return: None
+        """
         while True:
-            self.delete_dublicates()
+            self.delete_duplicates()
             if self.param['words'] != []:
                 print(f"You choosed next words - {', '.join(self.param['words'])}")
             print('Add word for researching or "delete" for delete all words or press 0 for Exit')
@@ -112,6 +132,10 @@ class Userinput:
                 break
 
     def choosing_city(self):
+        """
+        Adding city for researching
+        :return: None
+        """
         print('Add city for researching or press 0 for Exit')
         while True:
             user_input = input().lower()
@@ -123,13 +147,22 @@ class Userinput:
             else:
                 print('Try again. Because we did not find this city or press 0 for Exit')
 
-    def check_city(self, user_input):
+    def check_city(self, user_input:str):
+        """
+        Checking city from user
+        :param user_input: str
+        :return: True or False
+        """
         if self.hh_api.saver_areas.open_and_find_info(user_input) or self.sj_api.saver_areas.open_and_find_info(user_input):
             return True
         else:
             return False
 
     def choosing_date(self):
+        """
+        Choosing number of days for researching
+        :return:
+        """
         while True:
             print('Choose number of days for research')
             print('1 - 1 day')
@@ -156,6 +189,10 @@ class Userinput:
                 print('Unknown command')
 
     def research_vacancies(self):
+        """
+        Getting vacancies from HH and SJ, creating objects class Vacancy.
+        :return: None
+        """
         if 'HeadHunter' in self.param['website']:
             if self.param['city'] != []:
                 for item in range(len(self.param['city'])):
@@ -189,6 +226,10 @@ class Userinput:
         self.sorting_vacancies()
 
     def sorting_vacancies(self):
+        """
+        Menu for sort and filter vacancies
+        :return: None
+        """
         while True:
             print(f'We found {len(self.all_list)} vacancies. We can sort or filter these. Choose what we should doing?')
             print('1 - Sorting vacancies on data')
@@ -238,9 +279,17 @@ class Userinput:
                 print('Unknown command')
 
     def showing_all_list_vacancies(self):
+        """
+        Showing all vacancies
+        :return: None
+        """
         print(self.all_list)
 
     def choosing_vacancies_in_my_list(self):
+        """
+        Choosing favorite vacancies. Adding in favorite list.
+        :return:
+        """
         while True:
             print('Which vacancies are you choose? Write numbers (separated by space, fx "1 2 3 4 5"). You can write "all" for adding all vacancies in your favorite list.')
             numbers_vacancies = input().lower()
@@ -269,6 +318,10 @@ class Userinput:
                 self.saving_my_list_vacancies()
 
     def saving_my_list_vacancies(self):
+        """
+        Last menu for saving vacancies in CSV-file.
+        :return: None
+        """
         while True:
             print(f'We added {len(self.mylist)} vacancies. We can save these or we can vake new research. Choose what we should doing?')
             print('1 - Save my favorite vacancies in CSV file')
@@ -291,13 +344,14 @@ class Userinput:
             else:
                 print('Unknown command')
 
-    def delete_dublicates(self):
+    def delete_duplicates(self):
+        """
+        Function for deleting duplicates in parameters
+        :return: None
+        """
         self.param = {
             'website': list(set(self.param['website'])),
             'city': list(set(self.param['city'])),
             'words': list(set(self.param['words'])),
             'date': self.param['date']
         }
-
-class Usertelebot:
-    pass

@@ -161,9 +161,3 @@ class Userinput_telebot:
                 for item in vacancies_sj:
                     vacancy = Vacancy.create_vacancy_from_sj(item)
                     self.all_list.add_vacancy(vacancy)
-
-
-        #self.sorting()
-
-
-
