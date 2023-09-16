@@ -188,7 +188,12 @@ class Userinput_telebot:
                     vacancy = Vacancy.create_vacancy_from_sj(item)
                     self.all_list.add_vacancy(vacancy)
 
-        self.param = self.new_param.copy()
+        self.param = {
+            'website': [],
+            'city': [],
+            'words': [],
+            'date': 14
+        }
 
     def check_city(self, user_input:str):
         """
