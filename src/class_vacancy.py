@@ -1,7 +1,10 @@
 import datetime
 
 class Vacancy:
-    def __init__(self, vacancy_information):
+    """
+    Class for Vacancy
+    """
+    def __init__(self, vacancy_information: dict):
         self.id = vacancy_information["id"]
         self.type = vacancy_information["type"]
         self.name = vacancy_information["name"]
@@ -33,6 +36,10 @@ Url - {self.url}
 '''
 
     def salary_average(self):
+        """
+        Calculates average salary.
+        :return: average salary
+        """
         if self.salary_from:
             if self.salary_to:
                 result = int((self.salary_to + self.salary_from) / 2)
@@ -47,7 +54,12 @@ Url - {self.url}
         return result
 
     @classmethod
-    def create_vacancy_from_hh(cls, vacancy_info_hh):
+    def create_vacancy_from_hh(cls, vacancy_info_hh: dict):
+        """
+        This classmethod is converting information about vacancy from headhunter and creating object Vacancy
+        :param vacancy_info_hh: dict with information about vacancy
+        :return: object Vacancy
+        """
         result = {
             "id": vacancy_info_hh["id"],
             "website": 'HeadHunter',
@@ -68,7 +80,12 @@ Url - {self.url}
         return Vacancy(result)
 
     @classmethod
-    def create_vacancy_from_sj(cls, vacancy_info_sj):
+    def create_vacancy_from_sj(cls, vacancy_info_sj: dict):
+        """
+        This classmethod is converting information about vacancy from superjob and creating object Vacancy
+        :param vacancy_info_hh: dict with information about vacancy
+        :return: object Vacancy
+        """
         result ={
             "id": vacancy_info_sj["id"],
             "website": 'SupurJob',
@@ -89,7 +106,14 @@ Url - {self.url}
         return Vacancy(result)
 
     @staticmethod
-    def check_params(vacancy_information, param1, param2=None):
+    def check_params(vacancy_information: dict, param1: str, param2: str =None):
+        """
+        This staticmethod use during creating object Vacancy with info from headhunter
+        :param vacancy_information: dict
+        :param param1: str
+        :param param2: str
+        :return: parameter or None
+        """
         if param1 in vacancy_information:
             if param2 is None:
                 return vacancy_information[param1]
