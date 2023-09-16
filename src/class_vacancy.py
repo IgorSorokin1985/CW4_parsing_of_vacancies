@@ -1,5 +1,4 @@
 import datetime
-import time
 
 class Vacancy:
     def __init__(self, vacancy_information):

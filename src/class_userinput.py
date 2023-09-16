@@ -1,6 +1,5 @@
 from src.classes_api import HeadHunterAPI, SuperJobAPI
 from src.class_mylist import Mylist
-import json
 from src.class_vacancy import Vacancy
 
 class Userinput:
@@ -68,7 +67,7 @@ class Userinput:
             elif user_input == '4':
                 self.choosing_date()
             elif user_input == '5':
-                self.research()
+                self.research_vacancies()
             else:
                 print('Unknown command')
 
@@ -125,7 +124,7 @@ class Userinput:
                 print('Try again. Because we did not find this city or press 0 for Exit')
 
     def check_city(self, user_input):
-        if user_input in self.hh_api.areas or user_input in self.sj_api.areas:
+        if self.hh_api.saver_areas.open_and_find_info(user_input) or self.sj_api.saver_areas.open_and_find_info(user_input):
             return True
         else:
             return False
@@ -156,7 +155,7 @@ class Userinput:
             else:
                 print('Unknown command')
 
-    def research(self):
+    def research_vacancies(self):
         if 'HeadHunter' in self.param['website']:
             if self.param['city'] != []:
                 for item in range(len(self.param['city'])):
@@ -187,9 +186,9 @@ class Userinput:
                    vacancy = Vacancy.create_vacancy_from_sj(item)
                    self.all_list.add_vacancy(vacancy)
 
-        self.sorting()
+        self.sorting_vacancies()
 
-    def sorting(self):
+    def sorting_vacancies(self):
         while True:
             print(f'We found {len(self.all_list)} vacancies. We can sort or filter these. Choose what we should doing?')
             print('1 - Sorting vacancies on data')
@@ -197,7 +196,8 @@ class Userinput:
             print('3 - Filter word')
             print('4 - Filter salary')
             print('5 - Show all vacancies')
-            print('6 - Go to showing vacancies and adding in your favorite list')
+            print('6 - Save all vacancies in CSV-file')
+            print('7 - Go to showing vacancies and adding in your favorite list')
             print('0 - Exit')
 
             user_input = input()
@@ -206,58 +206,69 @@ class Userinput:
                 self.__call__()
             elif user_input == '1':
                 self.all_list.sorting_vacancies_data()
-                self.showing()
+                self.showing_all_list_vacancies()
             elif user_input == '2':
                 self.all_list.sorting_vacancies_salary()
-                self.showing()
+                self.showing_all_list_vacancies()
             elif user_input == '3':
                 print('Which word we should use for filtering?')
                 word_filter = input().lower()
                 self.all_list.filter_list_word(word_filter)
-                self.showing()
+                self.showing_all_list_vacancies()
             elif user_input == '4':
                 print('Which salary we should use for filtering?')
                 while True:
                     salary = input()
                     if salary.isdigit():
                         self.all_list.filter_list_salary(int(salary))
-                        self.showing()
+                        self.showing_all_list_vacancies()
                         break
                     else:
                         print('Incorrect salary')
             elif user_input == '5':
-                self.showing()
+                self.showing_all_list_vacancies()
             elif user_input == '6':
-                self.showing()
-                self.choosing_vacancies()
+                path = self.all_list.save_csv()
+                print(f'Your favorite vacancies were saved in CSV-file - {path}')
+                self.__call__()
+            elif user_input == '7':
+                self.showing_all_list_vacancies()
+                self.choosing_vacancies_in_my_list()
             else:
                 print('Unknown command')
 
-    def showing(self):
+    def showing_all_list_vacancies(self):
         print(self.all_list)
 
-    def choosing_vacancies(self):
+    def choosing_vacancies_in_my_list(self):
         while True:
-            print('Which vacancies are you choose? Write numbers (separated by space, fx "1 2 3 4 5").')
-            numbers_vacancies = input()
+            print('Which vacancies are you choose? Write numbers (separated by space, fx "1 2 3 4 5"). You can write "all" for adding all vacancies in your favorite list.')
+            numbers_vacancies = input().lower()
             if numbers_vacancies == '0':
                 break
-            numbers = []
+            elif numbers_vacancies == 'all':
+                for vacancy in self.all_list.vacancy_list:
+                    self.mylist.add_vacancy(vacancy)
 
-            numbers_str = numbers_vacancies.split()
-            for number_str in numbers_str:
-                if number_str.isdigit():
-                    numbers.append(int(number_str))
-            if numbers == []:
-                print('Try again or press 0 for Exit')
-                continue
+                self.saving_my_list_vacancies()
+            else:
+                numbers = []
 
-            for number in numbers:
-                self.mylist.add_vacancy(self.all_list.get_vacancy(number-1))
+                numbers_str = numbers_vacancies.split()
+                for number_str in numbers_str:
+                    if number_str.isdigit():
+                        numbers.append(int(number_str))
+                if numbers == []:
+                    print('Try again or press 0 for Exit')
+                    continue
 
-            self.saving()
+                for number in numbers:
+                    if self.all_list.get_vacancy(number-1):
+                        self.mylist.add_vacancy(self.all_list.get_vacancy(number-1))
 
-    def saving(self):
+                self.saving_my_list_vacancies()
+
+    def saving_my_list_vacancies(self):
         while True:
             print(f'We added {len(self.mylist)} vacancies. We can save these or we can vake new research. Choose what we should doing?')
             print('1 - Save my favorite vacancies in CSV file')
@@ -271,7 +282,7 @@ class Userinput:
                 self.__call__()
             elif user_input == '1':
                 path = self.mylist.save_csv()
-                print(f'Your favorite vacancies were saved in CSV file - {path}')
+                print(f'Your favorite vacancies were saved in CSV-file - {path}')
                 self.__call__()
             elif user_input == '2':
                 print(self.mylist)

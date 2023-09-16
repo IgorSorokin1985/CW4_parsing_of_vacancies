@@ -19,5 +19,5 @@ class CSVSaver:
 
     def get_path(self):
         data_now = datetime.datetime.now()
-        result = 'data/' + str(data_now)[:19] + ' vacancies.csv'
+        result = 'data/research/' + str(data_now)[:19] + ' vacancies.csv'
         return result
