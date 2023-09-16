@@ -16,7 +16,7 @@ class CSVSaver:
         :return: path file
         """
         path = self.get_path()
-        with open(path, 'w', newline='') as file:
+        with open(path, 'w', newline='', encoding='UTF-8') as file:
             writer = csv.writer(file, delimiter=';')
             writer.writerow(
                 ['id', 'name', 'data_published', 'salary_from', 'salary_to', 'currency', 'area', 'url', 'employer', 'employer_url', 'requirement', 'experience', 'employment'])

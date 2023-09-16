@@ -20,30 +20,28 @@ class Userinput_telebot:
         }
 
     TOKEN: str = os.getenv('TELEBOT_TOKEN')
+
     def __init__(self):
         self.hh_api = HeadHunterAPI()
         self.sj_api = SuperJobAPI()
         self.all_list = Mylist()
-        self.mylist = Mylist()
         self.param = self.new_param
         self.bot = Bot(self.TOKEN)
         self.dp = Dispatcher(self.bot, storage=MemoryStorage())
 
-
-
     def __call__(self):
         class Data_reserch(StatesGroup):
-            text1 = State()
-            text2 = State()
-            text3 = State()
-            text4 = State()
+            choosing_websites = State()
+            add_word = State()
+            add_city = State()
+            choose_number_days = State()
+            sorting_vacancyes = State()
 
         b1 = KeyboardButton('/Research_vacancies')
-        b2 = KeyboardButton('/Show_favorite_vacancies')
 
         kb_client_1 = ReplyKeyboardMarkup(resize_keyboard=True)
 
-        kb_client_1.add(b1)#.add(b2)
+        kb_client_1.add(b1)
 
         b4 = KeyboardButton('/HeadHunter')
         b5 = KeyboardButton('/SuperJob')
@@ -60,6 +58,13 @@ class Userinput_telebot:
 
         kb_client_3.add(b7).add(b8).add(b9).add(b10)
 
+        kb_client_4 = ReplyKeyboardMarkup(resize_keyboard=True)
+
+        b11 = KeyboardButton('/Sorting_by_date')
+        b12 = KeyboardButton('/Sorting_by_salary')
+
+        kb_client_4.add(b11).add(b12)
+
         result = {}
 
         @self.dp.message_handler(commands=['start', 'help'])
@@ -68,15 +73,10 @@ class Userinput_telebot:
 
         @self.dp.message_handler(commands=['Research_vacancies'], state=None)
         async def command_start(message: types.Message):
-            await Data_reserch.text1.set()
+            await Data_reserch.choosing_websites.set()
             await self.bot.send_message(message.from_user.id, 'We can research vacancies om HeadHunter and SuperJob. Which website you would like to choose?', reply_markup=kb_client_2)
 
-        @self.dp.message_handler(commands=['Show_favorite_vacancies'])
-        async def command_start(message: types.Message):
-            await self.bot.send_message(message.from_user.id, 'TEXT2!!!!', reply_markup=kb_client_3)
-
-
-        @self.dp.message_handler(content_types=['text'], state=Data_reserch.text1)
+        @self.dp.message_handler(content_types=['text'], state=Data_reserch.choosing_websites)
         async def input_websites(message: types.Message):
 
             if message.text == '/HeadHunter':
@@ -90,20 +90,20 @@ class Userinput_telebot:
             await Data_reserch.next()
             await message.reply('Add word for researching', reply_markup=ReplyKeyboardRemove())
 
-        @self.dp.message_handler(state=Data_reserch.text2)
+        @self.dp.message_handler(state=Data_reserch.add_word)
         async def input_word(message: types.Message, state: FSMContext):
             async with state.proxy() as data:
                 self.param['words'].append(message.text.lower())
             await Data_reserch.next()
             await message.reply('Add city for researching')
 
-        @self.dp.message_handler(state=Data_reserch.text3)
+        @self.dp.message_handler(state=Data_reserch.add_city)
         async def input_city(message: types.Message):
             self.param['city'].append(message.text.lower())
             await Data_reserch.next()
             await message.reply('Choose number of days for research', reply_markup=kb_client_3)
 
-        @self.dp.message_handler(state=Data_reserch.text4)
+        @self.dp.message_handler(state=Data_reserch.choose_number_days)
         async def input_text4(message: types.Message):
             if message.text == '/30':
                 self.param['date'] = 30
@@ -117,13 +117,31 @@ class Userinput_telebot:
                 self.param['date'] = 7
 
             self.research()
-
-
             await Data_reserch.next()
-            for index, vacancy in enumerate(self.all_list.vacancy_list[:10]):
-                await self.bot.send_message(message.from_user.id, f'Vacancy N {index+1}\n{vacancy.__str__()}!', reply_markup=kb_client_1)
-            self.all_list.clear_list()
+            await message.reply(f'We found {len(self.all_list)} vacancies. How we should sort vacancies?', reply_markup=kb_client_4)
 
+        @self.dp.message_handler(state=Data_reserch.sorting_vacancyes)
+        async def input_city(message: types.Message):
+
+            if message.text == '/Sorting_by_date':
+                self.all_list.sorting_vacancies_data()
+            elif message.text == '/Sorting_by_salary':
+                self.all_list.sorting_vacancies_salary()
+            else:
+                pass
+
+            for index, vacancy in enumerate(self.all_list.vacancy_list[:10]):
+                await self.bot.send_message(message.from_user.id, f'Vacancy N {index+1}\nName - {vacancy.name}\nUrl - {vacancy.url}', reply_markup=kb_client_1)
+
+            path = self.all_list.save_csv()
+            await message.reply_document(open(path, 'rb'))
+
+            await self.bot.send_message(message.from_user.id,
+                                        f'I showed few vacancies late, if file all vacancies. Coding "windows-1251"',
+                                        reply_markup=kb_client_1)
+
+            self.all_list.clear_list()
+            await Data_reserch.next()
 
         @self.dp.message_handler()
         async def echo_send(message: types.Message):
@@ -161,3 +179,11 @@ class Userinput_telebot:
                 for item in vacancies_sj:
                     vacancy = Vacancy.create_vacancy_from_sj(item)
                     self.all_list.add_vacancy(vacancy)
+
+        self.param = {
+            'website': [],
+            'city': [],
+            'words': [],
+            'date': 14
+        }
+
