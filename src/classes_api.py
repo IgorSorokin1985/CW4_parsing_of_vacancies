@@ -5,6 +5,7 @@ import datetime
 import time
 import os
 from src.class_save_json import JSONSaver_Areas
+import copy
 
 class API(ABC):
 
@@ -40,7 +41,7 @@ class HeadHunterAPI(API):
     }
 
     def __init__(self):
-        self.params = self.params_zero
+        self.params = copy.deepcopy(self.params_zero)
         self.change_date()
         self.saver_areas = JSONSaver_Areas(self.HH_AREAS_JSON)
         if self.saver_areas.check_file():
@@ -55,7 +56,7 @@ class HeadHunterAPI(API):
         """
         response = requests.get(self.HH_API_URL, self.params)
         response_data = json.loads(response.text)
-        self.params = self.params_zero.copy()
+        self.params = copy.deepcopy(self.params_zero)
         if 'items' in response_data:
             return response_data['items']
         else:
@@ -159,7 +160,7 @@ class SuperJobAPI(API):
         }
         response = requests.get(self.SJ_API_URL, headers=headers, params=self.params)
         response_data = json.loads(response.text)
-        self.params = self.params_zero.copy()
+        self.params = copy.deepcopy(self.params_zero)
         if 'objects' in response_data:
             return response_data['objects']
         else:
