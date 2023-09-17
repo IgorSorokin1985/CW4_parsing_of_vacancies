@@ -8,6 +8,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import os
+import copy
 
 class Userinput_telebot:
     new_param = {
@@ -23,7 +24,7 @@ class Userinput_telebot:
         self.hh_api = HeadHunterAPI()
         self.sj_api = SuperJobAPI()
         self.all_list = Mylist()
-        self.param = self.new_param.copy()
+        self.param = copy.deepcopy(self.new_param)
         self.bot = Bot(self.TOKEN)
         self.dp = Dispatcher(self.bot, storage=MemoryStorage())
 
@@ -188,12 +189,7 @@ class Userinput_telebot:
                     vacancy = Vacancy.create_vacancy_from_sj(item)
                     self.all_list.add_vacancy(vacancy)
 
-        self.param = {
-            'website': [],
-            'city': [],
-            'words': [],
-            'date': 14
-        }
+        self.param = copy.deepcopy(self.new_param)
 
     def check_city(self, user_input:str):
         """

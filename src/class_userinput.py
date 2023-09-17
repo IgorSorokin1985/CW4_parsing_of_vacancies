@@ -1,6 +1,7 @@
 from src.classes_api import HeadHunterAPI, SuperJobAPI
 from src.class_mylist import Mylist
 from src.class_vacancy import Vacancy
+import copy
 
 class Userinput:
     """
@@ -18,7 +19,7 @@ class Userinput:
         self.sj_api = SuperJobAPI()
         self.all_list = Mylist()
         self.mylist = Mylist()
-        self.param = self.new_param.copy()
+        self.param = copy.deepcopy(self.new_param)
 
     def __call__(self):
         """
@@ -224,12 +225,7 @@ class Userinput:
                    vacancy = Vacancy.create_vacancy_from_sj(item)
                    self.all_list.add_vacancy(vacancy)
 
-        self.param = {
-            'website': [],
-            'city': [],
-            'words': [],
-            'date': 14
-        }
+        self.param = copy.deepcopy(self.new_param)
 
         self.sorting_vacancies()
 
