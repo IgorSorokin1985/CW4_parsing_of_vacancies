@@ -65,11 +65,14 @@ class Mylist:
         :param word: str
         :return: self
         """
+        delete_list = []
         for vacancy in self.vacancy_list:
             if word in vacancy.requirement or word in vacancy.name:
                 pass
             else:
-                self.vacancy_list.remove(vacancy)
+                delete_list.append(vacancy)
+        for vacancy in delete_list:
+            self.vacancy_list.remove(vacancy)
         return self
 
     def filter_list_salary(self, salary: int):
