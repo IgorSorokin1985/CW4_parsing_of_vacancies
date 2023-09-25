@@ -22,9 +22,10 @@ class Saver:
             writer.writerow(
                 ['id', 'name', 'data_published', 'salary_from', 'salary_to', 'currency', 'area', 'url', 'employer', 'employer_url', 'requirement', 'experience', 'employment'])
             for vacancy in vacancies:
-                writer.writerow([vacancy.id, vacancy.name, vacancy.data_published, vacancy.salary_from, vacancy.salary_to, vacancy.currency,
+                writer.writerow([vacancy.id, vacancy.name, datetime.datetime.fromtimestamp(vacancy.data_published).strftime('%Y-%m-%d %H:%M:%S'), vacancy.salary_from, vacancy.salary_to, vacancy.currency,
                                  vacancy.area, vacancy.url, vacancy.employer, vacancy.employer_url, vacancy.requirement, vacancy.experience, vacancy.employment])
         return path
+
 
     def get_path_csv(self):
         """
@@ -64,7 +65,7 @@ class Saver:
             worksheet.write(r+1, 0, r+1)
             worksheet.write(r+1, 1, vacancy.id)
             worksheet.write(r+1, 2, vacancy.name)
-            worksheet.write(r+1, 3, vacancy.data_published)
+            worksheet.write(r+1, 3, datetime.datetime.fromtimestamp(vacancy.data_published).strftime('%Y-%m-%d %H:%M:%S'))
             worksheet.write(r+1, 4, vacancy.salary_from)
             worksheet.write(r+1, 5, vacancy.salary_to)
             worksheet.write(r+1, 6, vacancy.currency)

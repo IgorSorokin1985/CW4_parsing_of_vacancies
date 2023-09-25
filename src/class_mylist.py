@@ -78,11 +78,14 @@ class Mylist:
         :param salary: int
         :return: self
         """
+        delete_list = []
         for vacancy in self.vacancy_list:
             if vacancy.salary_average >= salary:
                 pass
             else:
-                self.vacancy_list.remove(vacancy)
+                delete_list.append(vacancy)
+        for vacancy in delete_list:
+            self.vacancy_list.remove(vacancy)
         return self
 
     def save_csv(self):
