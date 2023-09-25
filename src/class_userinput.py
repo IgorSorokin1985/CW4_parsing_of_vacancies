@@ -50,7 +50,6 @@ class Userinput:
         Second menu for choosing research's parameters
         :return: None
         """
-        self.param = self.new_param
         while True:
             self.delete_duplicates()
             print('You need choose websites, city, date and words for research')

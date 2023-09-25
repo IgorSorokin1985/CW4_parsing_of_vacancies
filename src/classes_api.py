@@ -92,9 +92,8 @@ class HeadHunterAPI(API):
         :return: None
         """
         req = requests.get(HeadHunterAPI.HH_API_URL_AREAS)
-        data = req.content.decode()
-        req.close()
-        dict_areas = json.loads(data)
+        dict_areas = req.json()
+
         areas = {}
         for k in dict_areas:
             for i in range(len(k['areas'])):
